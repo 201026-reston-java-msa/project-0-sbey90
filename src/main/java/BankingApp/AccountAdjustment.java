@@ -2,7 +2,8 @@ package BankingApp;
 
 public interface AccountAdjustment {
 	
-	public void viewAndEdit();
+	public void view();
+	public void edit();
 	public void approveAndDeny();
 
 }
