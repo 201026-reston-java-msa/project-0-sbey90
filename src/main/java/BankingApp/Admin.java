@@ -1,10 +1,14 @@
 package BankingApp;
 
+import java.util.ArrayList;
+
 public class Admin extends FundAutomation implements AccountAdjustment {
 
 	private String name;
 	private long employeeNumber;
 	private double balance;
+	
+	private static ArrayList<Customer> customer1 = new ArrayList<Customer>();
 
 	// Constructor
 	public Admin(String name, long employeeNumber, double balance) {
@@ -19,8 +23,35 @@ public class Admin extends FundAutomation implements AccountAdjustment {
 		this.employeeNumber = employeeNumber;
 	}
 
+	
+	
 	// Instance Methods
 	
+	
+	// Adds new customer account and adds accountNumber for customer
+	@SuppressWarnings("null")
+	public boolean addCustomer(String customerName, double initialAmount) {
+		Customer existingCustomer = findCustomer(customerName);
+		if(existingCustomer == null) {
+			existingCustomer.deposit(initialAmount);
+			existingCustomer.generateAccountNumber(customerName);
+			return true;
+		} else {
+			System.out.println("Customer already exsists.");
+			return false;
+		}
+	}
+	
+	// Used inside of this class in order to locate customer
+	private Customer findCustomer(String customerName) {
+		for(int i = 0; i < customer1.size(); i++) {
+			Customer cust = customer1.get(i);
+			if(cust.getName().equals(customerName)) {
+				return cust;
+			} 
+		}
+		return null;
+	}
 	
 	
 	
@@ -43,14 +74,24 @@ public class Admin extends FundAutomation implements AccountAdjustment {
 	}
 
 	
-	
-	public void view() {
-		// TODO Auto-generated method stub
+	// Test
+	public void view(String customerName) {
+		Customer customer = new Customer();
+		if(customer1.contains(customerName)) {
+			System.out.println("Customer information: " 
+			+ customer.getName()+"\n"
+			+ customer.getUsername()+"\n"
+			+ customer.getPassword()+"\n"
+//			+ customer.getBalance()  // ArrayList is static and will not allow me to call the method here due to this
+			); 
+		} else {
+			System.out.println("Customer is not on file.");
+		}
 
 	}
 
 	public void edit() {
-		// TODO Auto-generated method stub
+		// replace();
 	}
 
 	public void approveAndDeny() {
@@ -66,19 +107,32 @@ public class Admin extends FundAutomation implements AccountAdjustment {
 	}
 
 	
-	// Refactor
+	// Re-factor -- May still need
+	/*public void deposit(String customerName, double amount) {
+		Customer customerExsists = findCustomer(customerName);
+		if(customerExsists != null) {
+			customerExsists.deposit(amount);
+		}
+	}*/
+	
+	
+	// Test
 	@Override
-	public double deposit(double amount) {
-		balance += amount;
-		return balance;
-
+	public void deposit(double amount) {
+		Customer cust = new Customer();
+		if(customer1.contains(cust)) {
+			balance = customer1.indexOf(cust); // test
+			balance += amount;
+		}
+		
 	}
 
 	
-	// Refactor
+	// Test
 	@Override
 	public void transfer(Customer customer, double x) {
-		if (x <= balance) {
+//		Customer customer1.balance = new Customer();
+		if (x <= customer1.indexOf(balance)) {
 			withdraw(x);
 			customer.deposit(x);
 			System.out.println("Transfer successful. Transferred: $" + x);
@@ -89,16 +143,17 @@ public class Admin extends FundAutomation implements AccountAdjustment {
 	}
 
 	
-	// Refactor
+	// Test
 	@Override
-	public double withdraw(double amount) {
+	public void withdraw(double amount) {
+		balance = customer1.indexOf(balance); // test
 		if(amount > balance) {
 			System.out.println("Insufficient funds.");
 		} else {
 			balance -= amount;
 		}
 		
-		return balance;
+	//	return balance;
 
 	}
 

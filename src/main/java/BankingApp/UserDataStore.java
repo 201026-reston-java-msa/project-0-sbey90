@@ -50,6 +50,8 @@ public class UserDataStore { // Singleton Pattern
 		}
 	}
 	
+	// Should be able to call the getInstance() method within main along with logic in order to access this class
+	
 	
 	
 	
