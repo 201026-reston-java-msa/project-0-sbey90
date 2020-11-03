@@ -1,19 +1,16 @@
 package BankingApp;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
-public class Customer extends FundAutomation implements JointAccount {
+public class Customer extends Account implements JointAccount {
 	
 	private String name; // may need to adjust implementation -- should be handled by our getter and setter
 	private int accountNumber;
 	private String password;
 	private String username;
-//	private double balance;
+	private double balance;  
 	
-	// private double balance (can possibly be included in an ArrayList)
-	
-	public static ArrayList<Double> balance = new ArrayList<Double>();
-
 	
 	public Customer(int accountNumber, String password, String username, String name, double initialAmount) {
 		
@@ -21,72 +18,93 @@ public class Customer extends FundAutomation implements JointAccount {
 		this.password = password;
 		this.username = username;
 		this.name = name;
-		this.balance = new ArrayList<Double>();
+		this.balance = balance;
 		deposit(initialAmount);
 		
 	}
 	
+	
 	public Customer() {
 		
+		// May need to include this particular in the main class and keep all other constructor lists (admin and employee) in their seperate classes
+		// Since this constructor will be called in Admin in order to take care of method functionality 
+		
+//		Scanner scan = new Scanner(System.in);
+//		System.out.println("Please choose from the options below: \n"
+//				+ "1. Register Account\n"
+//				+ "2. Log in:\n");
+//		String option = scan.nextLine();
+//		if(option.toLowerCase().equals("Log in")) {
+//			System.out.println("Enter username:\n");
+//			this.username = scan.nextLine();
+//			System.out.println("Enter Password:\n");
+//			this.password = scan.nextLine();
+//		} else {
+//			// register account here and generate the account number once user is registered
+//			generateAccountNumber();
+//		}
+		// Will also need to add a list to withdraw, deposit, transfer funds, or join an account after log in.
+		
+		
 	}
-
-	/*public Customer(String name, double initialAmount) {
-		this.name = name;
-		this.transactions = new ArrayList<Double>();
-	} */
+	
 
 
 	// Instance Methods
 	
-	// Generates an account number for the customer
-	public int generateAccountNumber(String customerName) {
-		accountNumber = (int) (10000000 + (Math.random() * 90000000));
-		return accountNumber;
+	// Generates an account number for the customer -- may need to adjust based off of student DB example
+	private void generateAccountNumber() {
+		this.accountNumber = (int) (10000000 + (Math.random() * 90000000));
 	}
 	
-	// Inherited Instance Methods
 	
 	
+	// Inherited Instance Methods -- Inherited from Account Abstract Class
 	
 		@Override
 		public void withdraw(double amount) {
-			for(int i = 0; i < balance.size(); i++) {
-				Customer customer = new Customer();
-				double customerBalance = customer.balance.get(i);
-				if(amount > customerBalance) {
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Please enter amount to withdraw: ");
+			amount = scan.nextDouble();
+				if(amount > balance) {
 					// Create custom OverdraftException to be thrown here
 					System.out.println("Insufficient funds."); 
 				} else {
-					customerBalance -= amount;
+					balance -= amount;
+					System.out.println("You have withdrawn: "+ amount +"\nCurrent Balance: "+ balance);
 				}
-			}
-//			return customerBalance;	
 		}
 		
 
 		@Override
-		public void deposit(double amount) {
-			this.balance.add(amount);
+		public void deposit(double amount) { 
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Please enter deposit amount: ");
+			amount = scan.nextDouble();
+			balance += amount;
+			System.out.println("You have successfully deposited: "+ amount);
+			System.out.println("Your current balance is: "+ balance);
 			
 		} 
 
 
 		@Override
-		public void transfer(Customer customer, double x) {
-			
-			for(int i = 0; i < balance.size(); i++) {
-				Customer cust = new Customer();
-				double customerBalance = cust.balance.get(i);
-				if(x < customerBalance) {
-					withdraw(x);
-					customer.deposit(x);
-					System.out.println("Transfer successful. Transferred: $"+ x);
-				} else {
-					System.out.println("Unable to complete transfer.");
-				}
+		public void transfer(double x) {
+			Scanner scan = new Scanner(System.in);
+			SavingsAccount savings = new SavingsAccount();
+			System.out.println("Please enter amount to be transferred");
+			x = scan.nextDouble();
+			if (x <= balance) {
+				balance -= x;
+//				withdraw(x);
+				savings.getBalance(x);  
+				System.out.println("Transfer successful. Transferred: $" + x);
+			} else {
+				System.out.println("Unable to complete transfer.");
 			}
-			
+
 		}
+
 
 
 
@@ -94,27 +112,6 @@ public class Customer extends FundAutomation implements JointAccount {
 			// TODO Auto-generated method stub
 			
 		}
-		
-		
-		
-		
-		
-		// Note: employeeNumber may need to be converted to a Customer ID or Account Number
-		
-		
-		
-	
-	
-	/*
-	 * register(); // done
-	 * isUserNameTaken(); // done
-	 * isLoginCorrect(); // done
-	 * addTransaction(); -- concrete method (done - withdraw)
-	 * 
-	 *  All will come from UserDataStore Interface
-	 */
-	
-	
 	
 	
 	// Getters
@@ -126,13 +123,13 @@ public class Customer extends FundAutomation implements JointAccount {
 
 	
 
-	public static ArrayList<Double> getBalance() {
+	
+
+	public double getBalance() {
 		return balance;
 	}
 
-	public static void setBalance(ArrayList<Double> balance) {
-		Customer.balance = balance;
-	}
+	// May still need setBalance method, will know later
 
 	public String getName() {
 		return name;
