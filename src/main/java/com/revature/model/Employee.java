@@ -50,6 +50,14 @@ public class Employee {
 	public void setEmployeeId(int employeeId) {
 		this.employeeId = employeeId;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "Employee [firstName=" + firstName + ", lastName=" + lastName + ", employeeId=" + employeeId + "]";
+	}
+	
 	
 	
 	

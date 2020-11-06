@@ -1,25 +1,16 @@
 package com.revature.daorepos;
 
-
-
-import java.util.List;
-
+import com.revature.model.CheckingAccount;
 import com.revature.model.Customer;
+import com.revature.model.SavingsAccount;
 
-// Implemented by DB
-
-
-/*
- * This will define the standard operations to be performed on model objects.
- */
 public interface CustomerDAO {
+
+	public boolean updateCredentials(String username, String password);
+	public boolean updateChecking(int id, CheckingAccount checking) ;
+	public boolean updateSavings(int id, SavingsAccount savings);
 	
-	public List<Customer> findAll(); // may remove later
-	/*
-	 * May want to move the methods below into interfaces and place those interfaces into an interface folder within the Service Package
-	 */
-	public void withdraw(double amount);
-	public void deposit(double amount);
-	public void transfer(double amount);
-	public void jointAccount();
+	
+	
+
 }

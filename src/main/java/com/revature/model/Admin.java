@@ -57,11 +57,19 @@ public class Admin {
 	public void setAdminId(int adminId) {
 		this.adminId = adminId;
 	}
-	
-	
-	
-	
 
+
+
+
+	@Override
+	public String toString() {
+		return "Admin [firstName=" + firstName + ", lastName=" + lastName + ", adminId=" + adminId + "]";
+	}
+	
+	
+	
+	
+	
 	
 
 

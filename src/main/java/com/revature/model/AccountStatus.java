@@ -2,20 +2,29 @@ package com.revature.model;
 
 public class AccountStatus {
 	
-	private String status;
+	private boolean status;
 
-	public AccountStatus(String status) {
+	public AccountStatus(boolean status) {
 		this.status = status;
+	}
+	
+	public AccountStatus() {
+		
 	}
 
 	
 	
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "AccountStatus [status=" + status + "]";
 	}
 	
 	

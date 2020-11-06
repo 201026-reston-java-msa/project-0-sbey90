@@ -8,23 +8,25 @@ public class Customer  {
 	private String lastName;
 	private int Id;
 	private String password;
-	private String username;
-	private double balance;  
+	private String username;  
 	private CheckingAccount checkingAccount;
 	private SavingsAccount savings;
 	
 	
 	
-	public Customer(String firstName, String lastName, int Id, String password, String username, double balance, CheckingAccount checkingAccount, SavingsAccount savings) {
+	public Customer(int Id, String firstName, String lastName, String password, String username,CheckingAccount checkingAccount, SavingsAccount savings) {
 		
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.Id = Id;
 		this.password = password;
 		this.username = username;
-		this.balance = balance;
 		this.checkingAccount = checkingAccount;
 		this.savings = savings;
+	}
+	
+	public Customer() {
+		
 	}
 
 	
@@ -107,15 +109,12 @@ public class Customer  {
 		this.username = username;
 	}
 
-
-	public double getBalance() {
-		return balance;
+	@Override
+	public String toString() {
+		return "Customer [firstName=" + firstName + ", lastName=" + lastName + ", Id=" + Id + ", password=" + password
+				+ ", username=" + username + ", checkingAccount=" + checkingAccount + ", savings=" + savings + "]";
 	}
 
-
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
 
 	
 	

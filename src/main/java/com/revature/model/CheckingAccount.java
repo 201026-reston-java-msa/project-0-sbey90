@@ -2,27 +2,30 @@ package com.revature.model;
 
 public class CheckingAccount {
 	
-	private double amount;
+	private double balance;
 	private AccountStatus status;
 	
 	
 	
-	public CheckingAccount(double amount, AccountStatus status) {
-		this.amount = amount;
+	public CheckingAccount(double balance, AccountStatus status) {
+		this.balance = balance;
 		this.status = status;
 	}
-
-
-
 	
-	public double getAmount() {
-		return amount;
+	
+	
+	public CheckingAccount() {
+		
+	}
+
+	public double getBalance() {
+		return balance;
 	}
 
 
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setBalance(double balance) {
+		this.balance = balance;
 	}
 
 
@@ -35,6 +38,13 @@ public class CheckingAccount {
 
 	public void setStatus(AccountStatus status) {
 		this.status = status;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "CheckingAccount [balance=" + balance + ", status=" + status + "]";
 	}
 	
 	

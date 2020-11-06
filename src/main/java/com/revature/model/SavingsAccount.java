@@ -2,26 +2,30 @@ package com.revature.model;
 
 public class SavingsAccount {
 	
-	private double amount;
+	private double balance;
 	private double interest = 2.9;
 	
 	
 	
-	public SavingsAccount(double amount, double interest) {
-		this.amount = amount;
+	public SavingsAccount(double balance, double interest) {
+		this.balance = balance;
 		this.interest = interest;
 	}
-
-
-
-	public double getAmount() {
-		return amount;
+	
+	public SavingsAccount() {
+		
 	}
 
 
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public double getBalance() {
+		return balance;
+	}
+
+
+
+	public void setBalance(double balance) {
+		this.balance = balance;
 	}
 
 
@@ -34,6 +38,11 @@ public class SavingsAccount {
 
 	public void setInterest(double interest) {
 		this.interest = interest;
+	}
+
+	@Override
+	public String toString() {
+		return "SavingsAccount [balance=" + balance + ", interest=" + interest + "]";
 	}
 
 	

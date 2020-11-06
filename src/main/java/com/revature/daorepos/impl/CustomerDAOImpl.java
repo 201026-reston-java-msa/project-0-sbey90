@@ -1,58 +1,96 @@
 package com.revature.daorepos.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.revature.connectionutil.ConnectionUtil;
 import com.revature.daorepos.CustomerDAO;
+import com.revature.model.CheckingAccount;
 import com.revature.model.Customer;
-
-/*
- * This class implements above interface. 
- * This class is responsible to get data from a data source which can be database / xml or any other storage mechanism.
- */
+import com.revature.model.SavingsAccount;
+import com.sun.tools.sjavac.Log;
 
 public class CustomerDAOImpl implements CustomerDAO {
-	
-	
-	
-	public CustomerDAOImpl(List<Customer> customers) {
-		this.customers = new ArrayList<Customer>();
+
+	Logger log = Logger.getLogger(CustomerDAOImpl.class);
+	ArrayList<Customer> customers = new ArrayList<Customer>();
+
+	public CustomerDAOImpl(ArrayList<Customer> customers) {
+		super();
+		this.customers = customers;
 	}
 
-	private static Logger log = Logger.getLogger(CustomerDAOImpl.class);
-	
-	List<Customer> customers;
-	
-	
-	
+	@Override
+	public boolean updateCredentials(String username, String password) {
+		try (Connection conn = ConnectionUtil.getConnection();) {
 
-	public void withdraw(double amount) {
-		// TODO Auto-generated method stub
-		
+			String sql = "UPDATE BankingApp.customers WHERE username =? WHERE password = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				ps.setString(4, username);
+				ps.setString(5, password);
+				ps.executeUpdate();
+			}
+			rs.close();
+
+		} catch (SQLException e) {
+			Log.warn("Unable to update password in the database.");
+		}
+		return false;
 	}
 
-	public void deposit(double amount) {
-		// TODO Auto-generated method stub
-		
+	@Override
+	public boolean updateChecking(int id, CheckingAccount checking) {
+
+		try (Connection conn = ConnectionUtil.getConnection();) {
+
+			String sql = "UPDATE BankingApp.customers WHERE checking = ? WHERE customer_id = ? ";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				ps.setObject(1, checking);
+				ps.setInt(2, id);
+				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
+				log.info("Executed update to the database.");
+				return true;
+			}
+			ps.close();
+
+		} catch (SQLException e) {
+			Log.warn("Unable to connect to Checking Account");
+		}
+		return false;
 	}
 
-	public void transfer(double amount) {
-		// TODO Auto-generated method stub
-		
-	}
+	@Override
+	public boolean updateSavings(int id, SavingsAccount savings) {
+		try (Connection conn = ConnectionUtil.getConnection();) {
 
-	public void jointAccount() {
-		// TODO Auto-generated method stub
-		
-	}
+			String sql = "UPDATE BankingApp.customers WHERE savings = ? WHERE customer_id = ? ";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
 
-	public List<Customer> findAll() {   // may remove later
-		// TODO Auto-generated method stub
-		return null;
+			while (rs.next()) {
+				ps.setObject(1, savings);
+				ps.setInt(2, id);
+				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
+				log.info("Executed update to the database.");
+				return true;
+			}
+			ps.close();
+
+		} catch (SQLException e) {
+			Log.warn("Unable to connect to Savings Account");
+		}
+		return false;
 	}
-	
-	
 
 }
