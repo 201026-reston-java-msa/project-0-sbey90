@@ -17,8 +17,9 @@ import com.revature.model.Customer;
 import com.revature.model.SavingsAccount;
 import com.sun.tools.sjavac.Log;
 
-// POSSIBLY DONE
-public class AdminDaoImpl implements AdminDAO {
+// UNABLE TO PERSIST
+
+public class AdminDaoImpl extends CheckingAccount implements AdminDAO {
 
 	public AdminDaoImpl(List<Customer> customers) {
 		this.customers = new ArrayList<Customer>();
@@ -26,60 +27,59 @@ public class AdminDaoImpl implements AdminDAO {
 
 	private static Logger log = Logger.getLogger(AdminDaoImpl.class);
 
-	List<Customer> customers;
+	List<Customer> customers = new ArrayList<Customer>();
 
 	// REFACTOR
 	@Override
-	public Customer findById(int Id) {
+	public String findByName(String name) { // Index 0 out of bounds for length 0
+		String customerName = "";
 
 		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = "SELECT customer_id FROM customers WHERE first_name = ? ORDER BY customer_id "; // TEST - hard
-																											// code
+			String sql = "SELECT * FROM bankingapp.customers_ WHERE first_name = " + name + ";"; // need to figure out a parameter to search for here or refactor to search by name
+			
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				customers.get(Id);
+			if (rs.next()) {  // was while
+				customerName = rs.getString(name);
 			}
 			rs.close();
 
 		} catch (SQLException e) {
-			Log.warn("Unable to return customer Id from the database.");
+			log.warn("Unable to return customer name from the database.");
+			e.printStackTrace();
 		}
-		return customers.get(Id);
+		return customerName;
 	}
 
+	
 	@Override
-	public boolean insert(Customer c) {
+	public boolean insert(CheckingAccount checking, String username) { // FINISHED!
+		
+		CheckingAccount account = new CheckingAccount();
+		SavingsAccount savings = new SavingsAccount();
+		int id = 1;
+		
+		try (Connection conn = ConnectionUtil.getConnection()) { // TESTING
 
-		try (Connection conn = ConnectionUtil.getConnection();) {
+			
+			String sql = "INSERT INTO bankingapp.accounts_ (checking, savings) VALUES (?, ?);";
+			PreparedStatement ps3 = conn.prepareStatement(sql);
+			ps3.setDouble(1, account.getBalance());
+			ps3.setDouble(2, savings.getBalance());
+			ps3.setInt(1, id); // ADDING THIS ADDED THE WRONG VALUES BUT IT DID PERSIST!
+			ps3.executeUpdate();
 
-			String sql = "INSERT INTO customers (first_name, last_name, customer_username, customer_password, checking, savings)"
-					+ "VALUES (?, ? ,? ,? ,? ,?)";
-
-			PreparedStatement ps = conn.prepareCall(sql);
-			ps.setString(1, c.getFirstName());
-			ps.setString(2, c.getLastName());
-			ps.setString(3, c.getUsername());
-			ps.setString(4, c.getPassword());
-
-			CheckingAccount checking = c.getCheckingAccount();
-			SavingsAccount savings = c.getSavings();
-
-			if (checking != null) {
-				ps.setInt(5, c.getId());
-			} else {
-				ps.setNull(5, java.sql.Types.NULL);
-			}
-
-			if (!ps.execute()) {
-				return false;
-			}
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			Log.warn("Unable to insert into the database.");
+ 
+			log.info("Connectivity Successful.");
+			log.info("Customer has been inserted.");
+		} 
+		//rs.close();
+		catch (SQLException e) {
+			
+			log.warn("Unable to insert into the database.");
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -90,7 +90,7 @@ public class AdminDaoImpl implements AdminDAO {
 
 		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = ""; // NEED TO CREATE A QUERY
+			String sql = "UPDATE bankingapp.customers_ SET first_name = ? WHERE last_name = ?;"; 
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
@@ -103,43 +103,66 @@ public class AdminDaoImpl implements AdminDAO {
 
 		} catch (SQLException e) {
 
-			Log.warn("Unable to update Customer Name.");
+			log.warn("Unable to update Customer Name.");
 		}
 
 	}
 
-	// Figure out how the deposit, withdraw, etc. will work
-	@Override
-	public boolean updateChecking(int id, CheckingAccount checking) {
+	@Override 
+	public boolean updateChecking(int id, double checking) {
+		CheckingAccount account = new CheckingAccount();
 
 		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = "UPDATE BankingApp.customers WHERE checking = ? WHERE customer_id = ? ";
+			String sql = "UPDATE bankingapp.accounts_ SET checking = ? WHERE account_id = ?;";  // was ?
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
+			
+			ps.setInt(2, id); // was 1
+			ps.setDouble(1, checking); // was account.getBalance(); -- CHANGING 2 PARAMTER TO CHECKING ^ FIXED IT!
+			
+			ps.executeUpdate();
 
-			while (rs.next()) {
-				ps.setObject(1, checking);
-				ps.setInt(2, id);
-				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
-				log.info("Executed update to the database.");
-				return true;
-			}
-			ps.close();
+			log.info("Executed update to the database.");
+			return true;			
 
 		} catch (SQLException e) {
-			Log.warn("Unable to connect to Checking Account");
+			log.warn("Unable to connect to Checking Account");
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	// NOT PERSISTING
+	@Override
+	public boolean updateSavings(int id, double savings) {
+
+		try (Connection conn = ConnectionUtil.getConnection()) {
+
+			String sql = "UPDATE bankingapp.accounts_ SET savings = ? WHERE account_id = ?;";  
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setInt(2, id);  // was 2, id
+			ps.setDouble(1, savings);  // was ps.setDouble(2, savings);
+			ps.executeUpdate();
+			
+			 // SHOULD WORK -- TESTING POINT
+			log.info("Executed update to the database.");
+			return true;	
+		} 
+		catch (SQLException e) {
+			log.warn("Unable to connect to Savings Account");
+			e.printStackTrace();
 		}
 		return false;
 	}
 
 	// DO NEXT
 	@Override
-	public void remove(Customer c) {
+	public void remove(Customer c) { // TEST
 
 		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = "DELETE FROM customers WHERE customer_id = ?";
+			String sql = "DELETE FROM bankingapp.customers_ WHERE customer_id = ?;";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
@@ -149,66 +172,47 @@ public class AdminDaoImpl implements AdminDAO {
 			}
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			Log.warn("Unable to insert into the database.");
+			
+			log.warn("Unable to remove from the database.");
 		}
 
 	}
 
+	// DONE
 	@Override
-	public List<Customer> findAll() {
+	public List<Customer> findAll() {  
 
-		try (Connection conn = ConnectionUtil.getConnection();) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT * FROM  customer";
+			String sql = "SELECT * FROM  bankingapp.customers_  ORDER BY customer_id"; // WHERE customer_id = ?
 
-			Statement stmt = conn.createStatement();
+			PreparedStatement ps = conn.prepareStatement(sql);
 
-			ResultSet rs = stmt.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				int id = rs.getInt("custmer_id");
+				int id = rs.getInt("customer_id");
 				String first_name = rs.getString("first_name");
 				String last_name = rs.getString("last_name");
 				String password = rs.getString("customer_password");
-				String username = rs.getString("cutomer_username");
-				CheckingAccount checking = (CheckingAccount) rs.getObject("checking");
-				SavingsAccount savings = (SavingsAccount) rs.getObject("savings");
+				String username = rs.getString("customer_username");
+				double checking = rs.getDouble("checking");
+				double savings = rs.getDouble("savings");
 
-				Customer c = new Customer(id, first_name, last_name, username, password, checking, savings);
+				Customer c = new Customer(id, first_name, last_name, username, password, savings, checking);
 				customers.add(c);
 
 			}
 			rs.close();
+			log.info("Obtained customers.");
 
 		} catch (SQLException e) {
-			Log.warn("Unable to retrieve customer from the Database.");
+			log.warn("Unable to retrieve customer from the Database.");
+			e.printStackTrace();
 		}
 		return customers;
 	}
 
-	@Override
-	public boolean updateSavings(int id, SavingsAccount savings) {
-
-		try (Connection conn = ConnectionUtil.getConnection();) {
-
-			String sql = "UPDATE BankingApp.customers WHERE savings = ? WHERE customer_id = ? ";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				ps.setObject(1, savings);
-				ps.setInt(2, id);
-				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
-				log.info("Executed update to the database.");
-				return true;
-			}
-			ps.close();
-
-		} catch (SQLException e) {
-			Log.warn("Unable to connect to Savings Account");
-		}
-		return false;
-	}
+	
 
 }

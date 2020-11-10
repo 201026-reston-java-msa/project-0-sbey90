@@ -9,7 +9,7 @@ import com.revature.model.SavingsAccount;
 public interface EmployeeDAO {
 	
 	public List<Customer> findAll();
-	public Customer findById(int Id);
+	public int findById(int Id);
 	public boolean insert(Customer c);
 	
 	

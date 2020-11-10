@@ -28,66 +28,70 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
 	List<Customer> customers;
 
-	public List<Customer> findAll() {
+	@Override
+	public List<Customer> findAll() {  
 
-		try (Connection conn = ConnectionUtil.getConnection();) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT * FROM  customer";
+			String sql = "SELECT * FROM  bankingapp.customers_  ORDER BY customer_id"; 
 
-			Statement stmt = conn.createStatement();
+			PreparedStatement ps = conn.prepareStatement(sql);
 
-			ResultSet rs = stmt.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				int id = rs.getInt("custmer_id");
+				int id = rs.getInt("customer_id");
 				String first_name = rs.getString("first_name");
 				String last_name = rs.getString("last_name");
 				String password = rs.getString("customer_password");
-				String username = rs.getString("cutomer_username");
-				CheckingAccount checking = (CheckingAccount) rs.getObject("checking");
-				SavingsAccount savings = (SavingsAccount) rs.getObject("savings");
+				String username = rs.getString("customer_username");
+				double checking = rs.getDouble("checking");
+				double savings = rs.getDouble("savings");
 
-				Customer c = new Customer(id, first_name, last_name, username, password, checking, savings);
+				Customer c = new Customer(id, first_name, last_name, username, password, savings, checking);
 				customers.add(c);
 
 			}
 			rs.close();
+			log.info("Obtained customers.");
 
 		} catch (SQLException e) {
-			Log.warn("Unable to retrieve customer from the Database.");
+			log.warn("Unable to retrieve customer from the Database.");
+			e.printStackTrace();
 		}
 		return customers;
 	}
 
-	// SHOULD WORK - NEED TO TEST
-	public Customer findById(int Id) {
+	
+	public int findById(int Id) {  // UNABLE TO PERSIST
 
-		try (Connection conn = ConnectionUtil.getConnection();) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT customer_id FROM customers WHERE first_name = ? ORDER BY customer_id "; // TEST - hard
-																											// code
+			String sql = "SELECT customer_id FROM bankingapp.customers_ WHERE customer_id = " + Id + ";"; 
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				customers.get(Id);
+			if (rs.next()) {  // was while
+				rs.getInt(Id);
 			}
 			rs.close();
 
 		} catch (SQLException e) {
-			Log.warn("Unable to return customer Id from the database.");
+			log.warn("Unable to return customer Id from the database.");
+			e.printStackTrace();
 		}
 
-		return customers.get(Id);
+		return Id;
 
 	}
 
 	@Override
 	public boolean insert(Customer c) {
-		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = "INSERT INTO customers (first_name, last_name, customer_username, customer_password, checking, savings)"
-					+ "VALUES (?, ? ,? ,? ,? ,?)";
+		try (Connection conn = ConnectionUtil.getConnection()) {
+
+			String sql = "INSERT INTO bankingapp.customers_ (first_name, last_name, customer_username, customer_password)"
+					+ " VALUES (?, ? ,? ,?);";
 
 			PreparedStatement ps = conn.prepareCall(sql);
 			ps.setString(1, c.getFirstName());
@@ -95,21 +99,9 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 			ps.setString(3, c.getUsername());
 			ps.setString(4, c.getPassword());
 
-			CheckingAccount checking = c.getCheckingAccount();
-			SavingsAccount savings = c.getSavings();
-
-			if (checking != null) {
-				ps.setInt(5, c.getId());
-			} else {
-				ps.setNull(5, java.sql.Types.NULL);
-			}
-
-			if (!ps.execute()) {
-				return false;
-			}
-
 		} catch (SQLException e) {
-			Log.warn("Unable to insert into the database.");
+			
+			log.warn("Unable to insert into the database.");
 			return false;
 		}
 		return true;

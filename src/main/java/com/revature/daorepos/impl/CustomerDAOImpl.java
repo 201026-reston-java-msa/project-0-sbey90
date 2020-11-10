@@ -1,6 +1,7 @@
 package com.revature.daorepos.impl;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,11 @@ import com.revature.model.Customer;
 import com.revature.model.SavingsAccount;
 import com.sun.tools.sjavac.Log;
 
-public class CustomerDAOImpl implements CustomerDAO {
+public class CustomerDAOImpl extends CheckingAccount implements CustomerDAO {
+
+	private static String url = "jdbc:postgresql://localhost:5432/public";
+	private static String username = "postgres";
+	private static String password = "Barata20";
 
 	Logger log = Logger.getLogger(CustomerDAOImpl.class);
 	ArrayList<Customer> customers = new ArrayList<Customer>();
@@ -26,69 +31,91 @@ public class CustomerDAOImpl implements CustomerDAO {
 	}
 
 	@Override
-	public boolean updateCredentials(String username, String password) {
-		try (Connection conn = ConnectionUtil.getConnection();) {
+	public boolean insert(Customer c) {
 
-			String sql = "UPDATE BankingApp.customers WHERE username =? WHERE password = ?";
+		try (Connection conn = DriverManager.getConnection(url, username, password)) {
+
+			String sql = "INSERT INTO bankingapp.customers_ (first_name, last_name, customer_username, customer_password, checking, savings)"
+					+ "VALUES (?, ? ,? ,?, ?, ?);";
+
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, c.getFirstName());
+			ps.setString(2, c.getLastName());
+			ps.setString(3, c.getUsername());
+			ps.setString(4, c.getPassword());
+			ps.setDouble(5, c.getCheckingAccount());
+			ps.setDouble(6, c.getSavings());
+			log.info("Connectivity Successful.");
+		} catch (SQLException e) {
+
+			log.warn("Unable to insert into the database.");
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateCredentials(String username, String password) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
+
+			String sql = "UPDATE public.bankingapp.credentials SET username = ? WHERE password = ?;";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				ps.setString(4, username);
-				ps.setString(5, password);
+				ps.setString(1, username);
+				ps.setString(2, password);
 				ps.executeUpdate();
 			}
 			rs.close();
 
 		} catch (SQLException e) {
-			Log.warn("Unable to update password in the database.");
+			log.warn("Unable to update password in the database.");
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateChecking(int id, double checking) {
+		CheckingAccount account = new CheckingAccount();
+
+		try (Connection conn = ConnectionUtil.getConnection();) {
+
+			String sql = "UPDATE bankingapp.accounts_ SET checking = ? WHERE account_id = ?;"; // was ?
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			ps.setInt(2, id); 
+			ps.setDouble(1, checking); 
+
+			ps.executeUpdate();
+
+			log.info("Executed update to the database.");
+			return true;
+
+		} catch (SQLException e) {
+			log.warn("Unable to connect to Checking Account");
+			e.printStackTrace();
 		}
 		return false;
 	}
 
-	@Override
-	public boolean updateChecking(int id, CheckingAccount checking) {
+	public boolean updateSavings(int id, double savings) {  // UNABLE TO PERSIST
 
-		try (Connection conn = ConnectionUtil.getConnection();) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
 
-			String sql = "UPDATE BankingApp.customers WHERE checking = ? WHERE customer_id = ? ";
+			String sql = "UPDATE bankingapp.accounts_ SET savings = ? WHERE account_id = ?;";
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				ps.setObject(1, checking);
-				ps.setInt(2, id);
-				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
-				log.info("Executed update to the database.");
-				return true;
-			}
-			ps.close();
+			ps.setDouble(3, savings);
+			ps.setInt(2, id);
+			ps.executeUpdate(); // SHOULD WORK -- TESTING POINT
+
+			log.info("Executed update to the database.");
+			return true;
 
 		} catch (SQLException e) {
-			Log.warn("Unable to connect to Checking Account");
-		}
-		return false;
-	}
-
-	@Override
-	public boolean updateSavings(int id, SavingsAccount savings) {
-		try (Connection conn = ConnectionUtil.getConnection();) {
-
-			String sql = "UPDATE BankingApp.customers WHERE savings = ? WHERE customer_id = ? ";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				ps.setObject(1, savings);
-				ps.setInt(2, id);
-				ps.executeUpdate(sql); // SHOULD WORK -- TESTING POINT
-				log.info("Executed update to the database.");
-				return true;
-			}
-			ps.close();
-
-		} catch (SQLException e) {
-			Log.warn("Unable to connect to Savings Account");
+			log.warn("Unable to connect to Savings Account");
 		}
 		return false;
 	}

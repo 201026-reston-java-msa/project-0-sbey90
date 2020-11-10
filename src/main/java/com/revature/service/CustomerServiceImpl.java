@@ -1,132 +1,126 @@
 package com.revature.service;
 
+import java.util.ArrayList;
+import java.util.List;
+// CHECK METHODS
 import java.util.Scanner;
 
+import com.revature.bankingapp.Main;
+import com.revature.daorepos.AdminDAO;
+import com.revature.daorepos.CredentialDAO;
+import com.revature.daorepos.CustomerDAO;
+import com.revature.daorepos.impl.CustomerDAOImpl;
+import com.revature.exception.OverdraftException;
 import com.revature.model.CheckingAccount;
+import com.revature.model.Customer;
 import com.revature.model.SavingsAccount;
-import com.revature.serviceinterfaces.CustomerService;
 
 // We will want to incorporate the customer object in order to create these methods 
 
-public class CustomerServiceImpl implements CustomerService {
-	
-	
-	
-	public CustomerServiceImpl() {
+public class CustomerServiceImpl extends CustomerDAOImpl {
+
+	CheckingAccount checking = new CheckingAccount();
+	SavingsAccount savingsAccount = new SavingsAccount();
+
+	public CustomerServiceImpl(ArrayList<Customer> customers) {
+		super(customers);
+
+		Scanner scan = new Scanner(System.in);
+
 		// Create customer menu here
-		
-		/*
-		 * I believe that the input that you put here will stay as the menu option
-		 * 
-		 */
-	}
-	
-	
 
-	
-	public double deposit(double amount) {
-		CheckingAccount checking = new CheckingAccount();
+		System.out.println("Please choose a number option from the list below: \n" + "1. - Checking Withdraw\n"
+				+ "2. - Checking Deposit\n" + "3. - Transfer Funds\n");
+		int option = scan.nextInt();
+
+		while (option != 5) {
+
+			double amount = 0;
+			double savings = 0;
+			double balance = 0;
+			int id = 0;
+
+			switch (option) {
+
+			case 1:
+				withdraw(amount);
+				break;
+			case 2:
+				deposit(amount, id);
+				break;
+			case 3:
+				transfer(savings, amount);
+				break;
+			default:
+				Main.run();
+			}
+			System.out.println("Thank you for choosing Nette's Bank!");
+			if (option != 5) {
+				System.out.println("Please choose a number option from the list below: \n" + "1. - Checking Withdraw\n"
+						+ "2. - Checking Deposit\n" + "3. - Transfer Funds\n");
+				option = scan.nextInt();
+			}
+
+		}
+
+	}
+
+	public double deposit(double amount, int account_id) {
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Please enter deposit amount: ");
+		System.out.println("Please enter an amount to deposit:\n");
+		amount = scan.nextInt();
+
+		if (amount > 0) {
+			super.setBalance(super.getBalance() + amount);
+			super.getBalance();
+			updateChecking(1, super.getBalance());
+		} else {
+			throw new OverdraftException("Insufficient funds.");
+		}
+
+		return super.getBalance();
+	}
+
+	@Override
+	public double withdraw(double amount) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Please enter an amount to withdraw:\n");
+		amount = scan.nextInt();
+
+		if (amount > super.getBalance()) {
+
+			throw new OverdraftException("Attempted to withdraw too many funds.");
+
+		} else if (super.getBalance() >= 0) {
+			super.setBalance(super.getBalance() - amount);
+			System.out.println(super.getBalance());
+			updateChecking(1, super.getBalance());
+		} else {
+			System.out.println("Unable to fulfill your request.");
+		}
+
+		return super.getBalance();
+	}
+
+	public void checkBalance() { // double balance
+		System.out.println("Current Balance: " + super.getBalance());
+	}
+
+	// STILL NOT PERSISTING - DUE TO SAVINGS!
+	@Override
+	public double transfer(double savings, double amount) {
+		System.out.println("You must enter a number here. If you wish to bypass the next prompt enter 0.");
+		Scanner scan = new Scanner(System.in);
 		amount = scan.nextDouble();
-		double customerBalance = checking.getBalance();
-		if(amount >= customerBalance) {
-			checking.setBalance(customerBalance + amount); // Keep going 
-			double balance = checking.getBalance(); 
-			System.out.println("You have successfully deposited: "+ amount);
-			System.out.println("Current Balance: " + balance);
-		} else {
-			// possibly throw exception heres
-			System.out.println("Invalid amount.");
-		}
-		
-		return amount;
-	}
 
-	
-	
-	public void withdraw(double amount) {
-		CheckingAccount checking = new CheckingAccount();
-		Scanner scan = new Scanner(System.in);
-		double customerBalance = checking.getBalance() + amount;
-		
-				
-				//deposit(amount);
-		System.out.println("Please enter withdrawal amount: ");
-		amount = scan.nextDouble();
-		
-		if( amount > customerBalance) {
-		System.out.println("Insufficient funds.");
+		if (amount < 0) {
+			throw new OverdraftException("Insufficient Funds.");
 		} else {
-			checking.setBalance(customerBalance - amount);
-			double balance = checking.getBalance(); 
-			System.out.println("You have successfully wihdrawn: " + amount);
-			System.out.println("Current Balance: " + balance);
-			
-		}
-		
-	}
-
-	
-
-	// REFACTOR
-	public void transfer(double amount) {
-		CheckingAccount checking = new CheckingAccount();
-		SavingsAccount savings = new SavingsAccount();
-		Scanner scan = new Scanner(System.in);
-		System.out.println("Please enter an amount to be transferred: ");
-		amount = scan.nextDouble();
-		double checkingsBalance = checking.getBalance();
-		double savingsBalance = savings.getBalance();
-		if(amount < checkingsBalance) {
-			withdraw(amount);
-			savings.setBalance(savingsBalance + amount);
-			System.out.println("You have successfully transferred: " + amount);
-			System.out.println("Current Savings Balance: " + savingsBalance);
-		} else {
-			// throw exception here
-		}
-		
-	}
-
-	
-	// TEST
-	public void applyForAccount(String choice) {
-		Scanner scan = new Scanner(System.in);
-		choice = scan.nextLine();
-		System.out.println("Would you like to apply for an account?\n"
-				+"Type Yes/No");
-		if(choice.equals("Yes".toLowerCase())) {
-			System.out.println("Your application is pending approval.");
-		} else if(choice.equals("No".toLowerCase())) {
-			System.out.println("Have a great day.");
-		} else {
-			System.out.println("Invalid entry.");
-		}
-		
-		AdminServiceImpl adminService = new AdminServiceImpl();
-		if(adminService.approveOrDeny(true)) {
-			System.out.println("Your account has been approved.");
-		} else if(adminService.approveOrDeny(false)) {
-			System.out.println("Your account has been denied.");
-		} else {
-			System.out.println("Your account is still pending.");
+			double transfer = super.transfer(savings, amount);
+			updateChecking(1, super.getBalance());
+			updateSavings(1, savingsAccount.getBalance()); // CHECK
+			return transfer;
 		}
 	}
-
-	
-	// LATER
-	public void jointAccount() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-
-	
-	
-	
-	
 
 }

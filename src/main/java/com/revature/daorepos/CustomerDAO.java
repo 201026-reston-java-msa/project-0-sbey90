@@ -7,10 +7,11 @@ import com.revature.model.SavingsAccount;
 public interface CustomerDAO {
 
 	public boolean updateCredentials(String username, String password);
-	public boolean updateChecking(int id, CheckingAccount checking) ;
-	public boolean updateSavings(int id, SavingsAccount savings);
-	
-	
-	
+
+	public boolean insert(Customer c);
+
+	public boolean updateChecking(int id, double checking);
+
+	public boolean updateSavings(int id, double savings);
 
 }
