@@ -41,14 +41,12 @@ public class CredentialServiceImpl extends CredentialDAOImpl {
 			default:
 				System.out.println("Thank you for choosing Nette's Bank.");
 				Main.run();
-				// MAY NEED TO ADD A CUSTOMER SERVICE CONSTRUCTOR CALL HERE
+
 			}
 			if (option != 4) {
 				System.out.println("Please choose a number from the options below:\n" + "1. - Register New User\n"
 						+ "2. - Apply for an Account \n" + "3. - Login\n");
 
-				// IN THE WRONG PLACE - CHANGING THIS AND IMPLEMENTING FOLLOW UP STATEMENT IN
-				// MAIN - MAY NEED TO CALL CONSTRUCTOR FROM DEFAULT
 				option = scan.nextInt();
 			}
 

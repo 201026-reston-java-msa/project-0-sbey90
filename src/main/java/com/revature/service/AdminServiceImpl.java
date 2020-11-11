@@ -15,8 +15,7 @@ import com.revature.model.CheckingAccount;
 import com.revature.model.Customer;
 import com.revature.model.SavingsAccount;
 
-// STILL TESTING
-public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
+public class AdminServiceImpl extends AdminDaoImpl {
 
 	private static Logger log = Logger.getLogger(AdminServiceImpl.class);
 
@@ -28,12 +27,11 @@ public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
 	public AdminServiceImpl(List<Customer> customers) {
 		super(customers);
 
-		// view method needs to be called as well
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Please choose a number from the options listed below: \n" + "1. - Create New Account\n"
 				+ "2. - View customer accounts\n" + "3. - Customer Checking Withdraw\n"
-				+ "4. - Customer Checking Deposit\n" + "5. - Customer Tranfer Funds\n" + "6. - Remove Customer Account\n"
-				+ "7. - Approve or Deny Account");
+				+ "4. - Customer Checking Deposit\n" + "5. - Customer Tranfer Funds\n"
+				+ "6. - Remove Customer Account\n" + "7. - Approve or Deny Account");
 		int option = scan.nextInt();
 
 		while (option != 8) {
@@ -63,7 +61,7 @@ public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
 				transfer(savings, amount);
 				break;
 			case 6:
-				removeCustomer(c, name); // FIX
+				removeCustomer(c, id); // FIX
 				break;
 			case 7:
 				approveOrDeny(c, verdict);
@@ -72,17 +70,17 @@ public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
 			}
 			System.out.println("Thank you for choosing Nette's Bank!");
 			if (option != 8) {
-				System.out.println("Please choose a number from the options listed below: \n" + "1. - Create New Account\n"
-						+ "2. - View customer accounts\n" + "3. - Customer Checking Withdraw\n"
-						+ "4. - Customer Checking Deposit\n" + "5. - Customer Tranfer Funds\n" + "6. - Remove Customer Account\n"
-						+ "7. - Approve or Deny Account");
+				System.out.println(
+						"Please choose a number from the options listed below: \n" + "1. - Create New Account\n"
+								+ "2. - View customer accounts\n" + "3. - Customer Checking Withdraw\n"
+								+ "4. - Customer Checking Deposit\n" + "5. - Customer Tranfer Funds\n"
+								+ "6. - Remove Customer Account\n" + "7. - Approve or Deny Account");
 				option = scan.nextInt();
 			}
 		}
 
 	}
 
-	// Need to tie in some approval logic for this method
 	public void newAccount(CheckingAccount account, String username) {
 		System.out.println("Please press enter to create new user account.");
 		insert(account, username);
@@ -127,7 +125,6 @@ public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
 		return super.getBalance();
 	}
 
-	// STILL NOT PERSISTING
 	@Override
 	public double transfer(double savings, double amount) {
 		System.out.println("You must enter a number here. If you wish to bypass the next prompt enter 0.");
@@ -139,18 +136,16 @@ public class AdminServiceImpl extends AdminDaoImpl { // CheckingAccount
 		} else {
 			double transfer = super.transfer(savings, amount);
 			updateChecking(1, super.getBalance());
-			updateSavings(1, savingsAccount.getBalance()); // CHECK
+			updateSavings(1, savingsAccount.getBalance() + amount); // CHECK
 			return transfer;
 		}
 	}
 
-	// Add a remove -- WORKING ON IT
-	public void removeCustomer(Customer c, String name) {
+	public void removeCustomer(Customer c, int id) {
 		Scanner scan = new Scanner(System.in);
-		System.out.println(
-				"Please enter the the first name of the customer you want to remove. PLEASE use single quotes around customer name ' ' ");
-		name = scan.nextLine();
-		findByName(name);
+		System.out.println("Please enter the id of the user you would like to remove.");
+		id = scan.nextInt();
+		findById(id);
 		if (c != null) {
 			remove(c);
 			log.info("Removed customer from database.");

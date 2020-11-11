@@ -10,11 +10,11 @@ public interface AdminDAO {
 
 	public List<Customer> findAll();
 
-	public String findByName(String name);
+	public int findById(int id);  
 
 	public boolean insert(CheckingAccount checking, String username);
 
-	public void remove(Customer c);
+	public void remove(Customer c); 
 
 	public void updateCustomerName(Customer c);
 

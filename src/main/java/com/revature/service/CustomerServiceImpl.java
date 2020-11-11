@@ -15,8 +15,6 @@ import com.revature.model.CheckingAccount;
 import com.revature.model.Customer;
 import com.revature.model.SavingsAccount;
 
-// We will want to incorporate the customer object in order to create these methods 
-
 public class CustomerServiceImpl extends CustomerDAOImpl {
 
 	CheckingAccount checking = new CheckingAccount();
@@ -26,8 +24,6 @@ public class CustomerServiceImpl extends CustomerDAOImpl {
 		super(customers);
 
 		Scanner scan = new Scanner(System.in);
-
-		// Create customer menu here
 
 		System.out.println("Please choose a number option from the list below: \n" + "1. - Checking Withdraw\n"
 				+ "2. - Checking Deposit\n" + "3. - Transfer Funds\n");
@@ -102,11 +98,10 @@ public class CustomerServiceImpl extends CustomerDAOImpl {
 		return super.getBalance();
 	}
 
-	public void checkBalance() { // double balance
+	public void checkBalance() {
 		System.out.println("Current Balance: " + super.getBalance());
 	}
 
-	// STILL NOT PERSISTING - DUE TO SAVINGS!
 	@Override
 	public double transfer(double savings, double amount) {
 		System.out.println("You must enter a number here. If you wish to bypass the next prompt enter 0.");
@@ -118,7 +113,7 @@ public class CustomerServiceImpl extends CustomerDAOImpl {
 		} else {
 			double transfer = super.transfer(savings, amount);
 			updateChecking(1, super.getBalance());
-			updateSavings(1, savingsAccount.getBalance()); // CHECK
+			updateSavings(1, savingsAccount.getBalance() + amount);
 			return transfer;
 		}
 	}

@@ -82,7 +82,7 @@ public class CustomerDAOImpl extends CheckingAccount implements CustomerDAO {
 
 		try (Connection conn = ConnectionUtil.getConnection();) {
 
-			String sql = "UPDATE bankingapp.accounts_ SET checking = ? WHERE account_id = ?;"; // was ?
+			String sql = "UPDATE bankingapp.accounts_ SET checking = ? WHERE account_id = ?;"; 
 			PreparedStatement ps = conn.prepareStatement(sql);
 
 			ps.setInt(2, id); 
@@ -100,22 +100,23 @@ public class CustomerDAOImpl extends CheckingAccount implements CustomerDAO {
 		return false;
 	}
 
-	public boolean updateSavings(int id, double savings) {  // UNABLE TO PERSIST
+	public boolean updateSavings(int id, double savings) { 
 
 		try (Connection conn = ConnectionUtil.getConnection()) {
 
 			String sql = "UPDATE bankingapp.accounts_ SET savings = ? WHERE account_id = ?;";
 			PreparedStatement ps = conn.prepareStatement(sql);
 
-			ps.setDouble(3, savings);
-			ps.setInt(2, id);
-			ps.executeUpdate(); // SHOULD WORK -- TESTING POINT
+			ps.setDouble(1, savings);  
+			ps.setInt(2, id);  
+			ps.executeUpdate(); 
 
 			log.info("Executed update to the database.");
 			return true;
 
 		} catch (SQLException e) {
 			log.warn("Unable to connect to Savings Account");
+			e.printStackTrace();
 		}
 		return false;
 	}

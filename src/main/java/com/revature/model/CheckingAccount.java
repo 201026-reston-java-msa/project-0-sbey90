@@ -14,8 +14,6 @@ public class CheckingAccount {
 
 	}
 
-	// Instance Methods
-
 	public double checkBalance(double balance) {
 		return this.balance;
 
@@ -23,16 +21,15 @@ public class CheckingAccount {
 
 	public double transfer(double savings, double amount) {
 		SavingsAccount savingsAccount = new SavingsAccount(); // testing
-		
 
 		if (amount > balance) {
-			System.out.println("Insufficient funds.");		
+			System.out.println("Insufficient funds.");
 		} else {
 			balance -= amount;
 			this.withdraw(amount);
 			savings = amount;
 			savingsAccount.deposit(amount);
-			System.out.println("Savings Balance: "+ (savings + amount)); // See what happens
+			System.out.println("Savings Balance: " + (savings + amount)); // See what happens
 		}
 		return savings;
 	}
@@ -58,7 +55,7 @@ public class CheckingAccount {
 		return balance;
 	}
 
-	// Getters & Setters
+	
 	public double getBalance() {
 		return balance;
 	}
